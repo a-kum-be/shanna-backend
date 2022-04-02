@@ -27,7 +27,7 @@ public class KnowledgeController {
     }
 
     @PostMapping("/post")
-    public List<KnowledgeDto> create(KnowledgeRequestDto dto){
+    public List<KnowledgeDto> create(@RequestBody KnowledgeRequestDto dto){
         return knowledgeService.save(dto.getText());
     }
 }
