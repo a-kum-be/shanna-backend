@@ -1,24 +1,28 @@
 package com.atob.shanna.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
-import java.util.Set;
+import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "knowledge")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@RequiredArgsConstructor
 public class Knowledge {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @NonNull
     private String name;
+    @NonNull
     private String description;
-    @ManyToMany
-    private Set<Knowledge> relations;
+    @NotNull
+    @ManyToMany(fetch = FetchType.LAZY)
+    private List<Knowledge> pointedBy = new ArrayList<>();
 }

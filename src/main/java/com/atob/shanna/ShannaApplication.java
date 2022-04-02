@@ -9,5 +9,6 @@ public class ShannaApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(ShannaApplication.class, args);
 	}
-
 }
+
+
