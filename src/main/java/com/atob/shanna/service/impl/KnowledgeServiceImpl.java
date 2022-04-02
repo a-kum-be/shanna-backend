@@ -39,7 +39,7 @@ public class KnowledgeServiceImpl implements KnowledgeService {
                 .replace("[", "")
                 .replace("]", "");
 
-        List<KnowledgeDto> referencedBy = new LinkedList<>();
+        List<KnowledgeDto> referencedBy = new ArrayList<>();
         Matcher m = Pattern.compile("\\{(.*?)\\}").matcher(rDots);
 
         while (m.find()) {

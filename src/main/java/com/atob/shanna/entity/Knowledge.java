@@ -23,6 +23,6 @@ public class Knowledge {
     @NonNull
     private String description;
     @NotNull
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.DETACH})
     private List<Knowledge> pointedBy = new ArrayList<>();
 }
