@@ -45,12 +45,13 @@ public class KnowledgeServiceImpl implements KnowledgeService {
         while (m.find()) {
             System.out.println(m.group(1));
 
-            Knowledge kn = new Knowledge();
-            kn.setName(m.group(1));
-            kn.setDescription("");
-            kn.setPointedBy(new ArrayList<>());
+                Knowledge kn = new Knowledge();
+                kn.setName(m.group(1));
+                kn.setDescription("");
+                kn.setPointedBy(new ArrayList<>());
 
-            referencedBy.add(entityToDto(knowledgeRepository.save(kn)));
+                referencedBy.add(entityToDto(kn));
+
         }
 
         String body = rDots.trim();
