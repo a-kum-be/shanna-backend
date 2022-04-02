@@ -1,7 +1,9 @@
 package com.atob.shanna.controller;
 
 import com.atob.shanna.dto.KnowledgeDto;
+import com.atob.shanna.dto.KnowledgeRequestDto;
 import com.atob.shanna.service.KnowledgeService;
+import com.atob.shanna.service.impl.KnowledgeServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,7 +29,7 @@ public class KnowledgeController {
     }
 
     @PostMapping("/post")
-    public List<KnowledgeDto> create(String text){
-        return knowledgeService.save(text);
+    public List<KnowledgeDto> create(KnowledgeRequestDto dto){
+        return knowledgeService.save(dto.getText());
     }
 }
