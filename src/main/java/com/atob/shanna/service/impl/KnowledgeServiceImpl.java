@@ -68,7 +68,20 @@ public class KnowledgeServiceImpl implements KnowledgeService {
     @Transactional
     @Override
     public List<KnowledgeDto> save(String text) {
-        knowledgeRepository.save(dtoToEntity(this.parse(text)));
+	KnowledgeDto kDto = this.parse(text);
+	List<Knowledge> parents = new ArrayList<>();
+	for(KnowledgeDto parent : kDto.pointedBy) {
+	    if(!knowledgeRepository.existsByName(parent.name)) {
+		Knowledge p = knowledgeRepository.save(dtoToEntity(parent));
+		parents.add(p);
+	    } else {
+		Knowledge p = knowledgeRepository.findByName(parent.name).get();
+		parents.add(p);
+	    }
+	}
+	Knowledge toSave = dtoToEntity(kDto);
+	toSave.pointedBy = parents;
+        knowledgeRepository.save(toSave);
         return knowledgeRepository.findAll().stream()
                 .map(this::entityToDto).collect(Collectors.toList());
     }

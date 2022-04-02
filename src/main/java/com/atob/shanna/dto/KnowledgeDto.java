@@ -13,9 +13,9 @@ public class KnowledgeDto {
 
     private Long id;
     @NonNull
-    private String name;
+    public String name;
     @NonNull
     private String description;
     @NonNull
-    private List<KnowledgeDto> pointedBy;
+    public List<KnowledgeDto> pointedBy;
 }
