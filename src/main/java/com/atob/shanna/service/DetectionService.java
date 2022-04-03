@@ -6,6 +6,6 @@ import java.util.List;
 
 public interface DetectionService {
 
-    String detect(final InputStream inputStream) throws IOException;
+    List<String> detect(final InputStream inputStream) throws IOException;
     List<String> split(String text);
 }

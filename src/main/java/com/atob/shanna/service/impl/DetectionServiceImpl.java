@@ -9,14 +9,16 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
 public class DetectionServiceImpl implements DetectionService {
 
     @Override
-    public String detect(final InputStream inputStream) throws IOException {
+    public List<String> detect(final InputStream inputStream) throws IOException {
         List<AnnotateImageRequest> requests = new ArrayList<>();
 
         ByteString imgBytes = ByteString.readFrom(inputStream);
@@ -45,7 +47,7 @@ public class DetectionServiceImpl implements DetectionService {
             for (AnnotateImageResponse res : responses) {
                 if (res.hasError()) {
                     System.out.format("Error: %s%n", res.getError().getMessage());
-                    return "";
+                    return List.of();
                 }
 
                 TextAnnotation annotation = res.getFullTextAnnotation();
@@ -68,7 +70,11 @@ public class DetectionServiceImpl implements DetectionService {
                         pageText = pageText + blockText;
                     }
                 }
-                return annotation.getText();
+                return Arrays.stream(annotation.getText().split("\\["))
+                        .filter(s -> !s.equals(""))
+                        .map(s -> s.replace("\n", " "))
+                        .map(s -> "[".concat(s))
+                        .collect(Collectors.toList());
             }
         }
         return null;

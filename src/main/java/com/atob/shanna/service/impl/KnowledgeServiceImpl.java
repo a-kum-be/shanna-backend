@@ -110,11 +110,12 @@ public class KnowledgeServiceImpl implements KnowledgeService {
     @Transactional
     @Override
     public List<KnowledgeResponseDto> bulkSave(MultipartFile file) throws IOException {
-        String text = detectionService.detect(file.getInputStream());
-        List<String> definitions = detectionService.split(text);
-        for(String def: definitions){
-            if(!def.equals(""))
-            this.save(def);
+        List<String> text = detectionService.detect(file.getInputStream());
+
+        for(String def: text){
+            if(!def.equals("")){
+                this.save(def);
+            }
         }
         return this.fetchAll();
     }
