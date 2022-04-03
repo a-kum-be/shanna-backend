@@ -1,10 +1,8 @@
 package com.atob.shanna.service.impl;
 
 import com.atob.shanna.service.DetectionService;
-import com.atob.shanna.service.KnowledgeService;
 import com.google.cloud.vision.v1.*;
 import com.google.protobuf.ByteString;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
