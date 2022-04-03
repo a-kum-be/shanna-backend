@@ -1,6 +1,7 @@
 package com.atob.shanna.controller;
 
 import com.atob.shanna.service.DetectionService;
+import com.atob.shanna.service.KnowledgeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,7 +24,6 @@ public class DetectionController {
     @PostMapping("/post")
     public String detect(@RequestParam("resource") MultipartFile image) throws IOException {
         InputStream is = image.getInputStream();
-
         return detectionService.detect(is);
     }
 }

@@ -9,7 +9,9 @@ import com.atob.shanna.service.KnowledgeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -105,10 +107,13 @@ public class KnowledgeServiceImpl implements KnowledgeService {
         return fetchAll();
     }
 
+    @Transactional
     @Override
-    public List<KnowledgeResponseDto> bulkSave(String[] texts) {
-        List<String> definitions = List.of(texts);
+    public List<KnowledgeResponseDto> bulkSave(MultipartFile file) throws IOException {
+        String text = detectionService.detect(file.getInputStream());
+        List<String> definitions = detectionService.split(text);
         for(String def: definitions){
+            if(!def.equals(""))
             this.save(def);
         }
         return this.fetchAll();
