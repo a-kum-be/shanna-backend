@@ -83,6 +83,8 @@ public class KnowledgeServiceImpl implements KnowledgeService {
         Knowledge toSave;
         if(knowledgeRepository.existsByName(kDto.getName())) {
             toSave = knowledgeRepository.findByName(kDto.getName()).get();
+            toSave.setDescription(text);
+
         } else {
             toSave = dtoToEntity(kDto);
         }
