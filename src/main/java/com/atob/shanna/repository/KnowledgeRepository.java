@@ -8,6 +8,7 @@ import java.util.Optional;
 
 @Repository
 public interface KnowledgeRepository extends JpaRepository<Knowledge, Long> {
+
     Optional<Knowledge> findByName(String name);
     boolean existsByName(String name);
 }

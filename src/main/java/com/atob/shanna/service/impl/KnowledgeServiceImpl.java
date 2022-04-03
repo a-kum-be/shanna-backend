@@ -1,7 +1,8 @@
 package com.atob.shanna.service.impl;
 
-import com.atob.shanna.dto.KnowledgeDto;
+import com.atob.shanna.dto.KnowledgeResponseDto;
 import com.atob.shanna.entity.Knowledge;
+import com.atob.shanna.exception.ResourceNotFoundException;
 import com.atob.shanna.repository.KnowledgeRepository;
 import com.atob.shanna.service.KnowledgeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,9 +28,8 @@ public class KnowledgeServiceImpl implements KnowledgeService {
         this.knowledgeRepository = knowledgeRepository;
     }
 
-    @Transactional
     @Override
-    public KnowledgeDto parse(final String text) {
+    public KnowledgeResponseDto parse(String text) {
         List<String> dots = Arrays.asList(text.split(":"));
 
         String lDots = dots.get(0);
@@ -39,9 +39,8 @@ public class KnowledgeServiceImpl implements KnowledgeService {
                 .replace("[", "")
                 .replace("]", "");
 
-        List<KnowledgeDto> referencedBy = new ArrayList<>();
+        List<KnowledgeResponseDto> referencedBy = new ArrayList<>();
         Matcher m = Pattern.compile("\\{(.*?)\\}").matcher(rDots);
-
         while (m.find()) {
             System.out.println(m.group(1));
 
@@ -51,13 +50,10 @@ public class KnowledgeServiceImpl implements KnowledgeService {
                 kn.setPointedBy(new ArrayList<>());
 
                 referencedBy.add(entityToDto(kn));
-
         }
-
         String body = rDots.trim();
         String name = iBrackets.trim();
-
-        return new KnowledgeDto(name, body, referencedBy);
+        return new KnowledgeResponseDto(name, body, referencedBy);
     }
 
     @Override
@@ -67,54 +63,71 @@ public class KnowledgeServiceImpl implements KnowledgeService {
 
     @Transactional
     @Override
-    public List<KnowledgeDto> save(String text) {
-	KnowledgeDto kDto = this.parse(text);
-	List<Knowledge> parents = new ArrayList<>();
-	for(KnowledgeDto parent : kDto.pointedBy) {
-	    if(!knowledgeRepository.existsByName(parent.name)) {
-		Knowledge p = knowledgeRepository.save(dtoToEntity(parent));
-		parents.add(p);
-	    } else {
-		Knowledge p = knowledgeRepository.findByName(parent.name).get();
-		parents.add(p);
-	    }
-	}
-	Knowledge toSave = dtoToEntity(kDto);
-	toSave.pointedBy = parents;
+    public List<KnowledgeResponseDto> save(String text) {
+        KnowledgeResponseDto kDto = this.parse(text);
+        List<Knowledge> parents = new ArrayList<>();
+        for (KnowledgeResponseDto parent : kDto.pointedBy) {
+            if (!knowledgeRepository.existsByName(parent.name)) {
+                Knowledge p = knowledgeRepository.save(dtoToEntity(parent));
+                parents.add(p);
+            } else {
+                Knowledge p = knowledgeRepository.findByName(parent.name).get();
+                parents.add(p);
+            }
+        }
+        Knowledge toSave;
+        if(knowledgeRepository.existsByName(kDto.getName())) {
+            toSave = knowledgeRepository.findByName(kDto.getName()).get();
+        } else {
+            toSave = dtoToEntity(kDto);
+        }
+        toSave.pointedBy = parents;
         knowledgeRepository.save(toSave);
-        return knowledgeRepository.findAll().stream()
-                .map(this::entityToDto).collect(Collectors.toList());
+
+        return fetchAll();
     }
 
     @Override
-    public List<KnowledgeDto> getAll() {
+    public List<KnowledgeResponseDto> getAll() {
+        return fetchAll();
+    }
+
+    @Override
+    @Transactional
+    public List<KnowledgeResponseDto> updateDescription(Long id, String newDescription) {
+        Knowledge knowledge = knowledgeRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Resource not found."));
+        knowledge.setDescription(newDescription);
+        knowledgeRepository.save(knowledge);
+        return fetchAll();
+    }
+
+    private List<KnowledgeResponseDto> fetchAll() {
         return knowledgeRepository.findAll().stream()
                 .map(this::entityToDto).collect(Collectors.toList());
     }
 
-    private KnowledgeDto entityToDto(Knowledge knowledge){
-            KnowledgeDto dto = new KnowledgeDto();
+    private KnowledgeResponseDto entityToDto(Knowledge knowledge){
+            KnowledgeResponseDto dto = new KnowledgeResponseDto();
             dto.setId(knowledge.getId());
             dto.setName(knowledge.getName());
             dto.setDescription(knowledge.getDescription());
-            List<KnowledgeDto> dtoPointedBy = new ArrayList<>();
+            List<KnowledgeResponseDto> dtoPointedBy = new ArrayList<>();
             if(knowledge.getPointedBy() != null){
                 knowledge.getPointedBy().forEach(k ->
-                        dtoPointedBy.add(new KnowledgeDto(k.getId(),
+                        dtoPointedBy.add(new KnowledgeResponseDto(k.getId(),
                                 k.getName(), k.getDescription(), new LinkedList<>())));
             }
             dto.setPointedBy(dtoPointedBy);
             return dto;
     }
 
-    private Knowledge dtoToEntity(KnowledgeDto dto){
+    private Knowledge dtoToEntity(KnowledgeResponseDto dto){
         Knowledge knowledge = new Knowledge();
         knowledge.setName(dto.getName());
         knowledge.setDescription(dto.getDescription());
-        if(dto.getPointedBy() != null) {
-            dto.getPointedBy().forEach(k ->
-                    knowledge.getPointedBy().add(new Knowledge(k.getName(), k.getDescription())));
-        }
+        dto.getPointedBy().forEach(k ->
+                knowledge.getPointedBy().add(new Knowledge(k.getName(), k.getDescription())));
         return knowledge;
     }
 }

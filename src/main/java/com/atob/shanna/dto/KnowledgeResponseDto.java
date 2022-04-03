@@ -2,14 +2,13 @@ package com.atob.shanna.dto;
 
 import lombok.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @RequiredArgsConstructor
-public class KnowledgeDto {
+public class KnowledgeResponseDto {
 
     private Long id;
     @NonNull
@@ -17,5 +16,5 @@ public class KnowledgeDto {
     @NonNull
     private String description;
     @NonNull
-    public List<KnowledgeDto> pointedBy;
+    public List<KnowledgeResponseDto> pointedBy;
 }
