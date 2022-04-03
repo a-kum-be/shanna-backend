@@ -6,7 +6,6 @@ import com.google.protobuf.ByteString;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -16,7 +15,6 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class DetectionServiceImpl implements DetectionService {
 
-    @Transactional
     @Override
     public String detect(final InputStream inputStream) throws IOException {
         List<AnnotateImageRequest> requests = new ArrayList<>();
@@ -39,9 +37,6 @@ public class DetectionServiceImpl implements DetectionService {
                 .build();
         requests.add(request);
 
-        // Initialize client that will be used to send requests. This client only needs to be created
-        // once, and can be reused for multiple requests. After completing all of your requests, call
-        // the "close" method on the client to safely clean up any remaining background resources.
         try (ImageAnnotatorClient client = ImageAnnotatorClient.create()) {
             BatchAnnotateImagesResponse response = client.batchAnnotateImages(requests);
             List<AnnotateImageResponse> responses = response.getResponsesList();
@@ -53,7 +48,6 @@ public class DetectionServiceImpl implements DetectionService {
                     return "";
                 }
 
-                // For full list of available annotations, see http://g.co/cloud/vision/docs
                 TextAnnotation annotation = res.getFullTextAnnotation();
                 for (Page page : annotation.getPagesList()) {
                     String pageText = "";
@@ -78,5 +72,9 @@ public class DetectionServiceImpl implements DetectionService {
             }
         }
         return null;
+    }
+
+    public String[] split(String text){
+        return text.split("\\[");
     }
 }

@@ -16,4 +16,6 @@ public interface KnowledgeService {
     List<KnowledgeResponseDto> getAll();
 
     List<KnowledgeResponseDto> updateDescription(Long id, String newDescription);
+
+    List<KnowledgeResponseDto> bulkSave(String[] texts);
 }

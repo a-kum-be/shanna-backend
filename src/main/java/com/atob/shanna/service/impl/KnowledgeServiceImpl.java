@@ -4,6 +4,7 @@ import com.atob.shanna.dto.KnowledgeResponseDto;
 import com.atob.shanna.entity.Knowledge;
 import com.atob.shanna.exception.ResourceNotFoundException;
 import com.atob.shanna.repository.KnowledgeRepository;
+import com.atob.shanna.service.DetectionService;
 import com.atob.shanna.service.KnowledgeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,10 +23,12 @@ import java.util.stream.Collectors;
 public class KnowledgeServiceImpl implements KnowledgeService {
 
     private final KnowledgeRepository knowledgeRepository;
+    private final DetectionService detectionService;
 
     @Autowired
-    public KnowledgeServiceImpl(KnowledgeRepository knowledgeRepository) {
+    public KnowledgeServiceImpl(KnowledgeRepository knowledgeRepository, DetectionService detectionService) {
         this.knowledgeRepository = knowledgeRepository;
+        this.detectionService = detectionService;
     }
 
     @Override
@@ -100,6 +103,15 @@ public class KnowledgeServiceImpl implements KnowledgeService {
         knowledge.setDescription(newDescription);
         knowledgeRepository.save(knowledge);
         return fetchAll();
+    }
+
+    @Override
+    public List<KnowledgeResponseDto> bulkSave(String[] texts) {
+        List<String> definitions = List.of(texts);
+        for(String def: definitions){
+            this.save(def);
+        }
+        return this.fetchAll();
     }
 
     private List<KnowledgeResponseDto> fetchAll() {
